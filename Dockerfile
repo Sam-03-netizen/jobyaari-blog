@@ -14,15 +14,6 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN npm install && npm run build
 
-RUN cp .env.example .env || true
-
-RUN php artisan key:generate --force || true
-
-RUN php artisan config:clear || true
-RUN php artisan cache:clear || true
-RUN php artisan route:clear || true
-RUN php artisan view:clear || true
-
 RUN chown -R www-data:www-data storage bootstrap/cache
 
 RUN a2enmod rewrite
