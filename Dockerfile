@@ -2,6 +2,8 @@ FROM dunglas/frankenphp
 
 WORKDIR /app
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 RUN install-php-extensions \
     pdo_pgsql pgsql zip pcntl
 
