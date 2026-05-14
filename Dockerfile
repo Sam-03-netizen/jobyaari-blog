@@ -1,12 +1,9 @@
-FROM php:8.2-apache
+FROM dunglas/frankenphp
 
-RUN apt-get update && apt-get install -y \
-    git unzip curl libpq-dev libzip-dev zip nodejs npm \
-    && docker-php-ext-install pdo pdo_pgsql zip
+WORKDIR /app
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www/html
+RUN install-php-extensions \
+    pdo_pgsql pgsql zip pcntl
 
 COPY . .
 
@@ -16,14 +13,6 @@ RUN npm install && npm run build
 
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-RUN a2enmod rewrite
-RUN a2dismod mpm_worker
-RUN a2dismod mpm_event
-RUN a2enmod mpm_prefork
-COPY .docker/vhost.conf /etc/apache2/sites-available/000-default.conf
-
 EXPOSE 8080
 
-RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
-
-CMD ["apache2-foreground"]
+CMD ["frankenphp", "php-server", "-r", "/app/public", "--listen", "0.0.0.0:8080"]
